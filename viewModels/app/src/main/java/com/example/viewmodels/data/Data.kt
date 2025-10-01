@@ -1,5 +1,9 @@
 package com.example.viewmodels.data
+import androidx.lifecycle.ViewModel
 import com.example.viewmodels.R
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 data class Person(val name: String, val desc: String, val image: Int)
 
@@ -12,4 +16,34 @@ object DataSource {
         Person("BRENDAN EICH", "Brendan Eich is a computer scientist and the creator of the JavaScript programming language. In addition, Eich co-founded the Mozilla project which manages the open source development of the Firefox web browser. He is also the CEO and co-founder of Brave Software, a start-up that is building an open source, privacy-focused browser, as well as a blockchain-based digital advertising platform.", R.drawable.brendan_eich),
         Person("JAMES GOSLING", "James Gosling is a Canadian computer scientist best known for inventing the Java programming language and virtual machine. Initially named “Oak” after a tree outside his office at Sun Microsystems, Java today has multiple open source distributions including OpenJDK and Amazon Corretto. In addition to his work on Java, Gosling also developed software for the Unix operating system including the shar utility which was used to bundle software programs and files together into a self extracting archive. Widely recognized for his contributions to the field of computer science, Gosling was named an Officer of the Order of Canada — the country’s highest civilian honor.", R.drawable.james_gosling)
     )
+}
+
+data class PersonUi( val indexPerson: Int = 0, val person: Person = DataSource.people[0])
+
+class PersonViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(value = PersonUi())
+    val uiState = _uiState.asStateFlow()
+
+    fun previousPerson() {
+        val novo = (_uiState.value.indexPerson - 1).mod(DataSource.people.size)
+
+        _uiState.update {
+            it.copy(
+                indexPerson = novo,
+                person = DataSource.people[novo]
+            )
+        }
+    }
+
+    fun nextPerson() {
+        val novo = (_uiState.value.indexPerson + 1).mod(DataSource.people.size)
+
+        _uiState.update {
+            it.copy(
+                indexPerson = novo,
+                person = DataSource.people[novo]
+            )
+        }
+    }
+
 }
